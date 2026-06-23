@@ -1,0 +1,17 @@
+{
+  "name": "manychat-openai-whatsapp",
+  "version": "1.0.0",
+  "description": "Webhook ManyChat + OpenAI + Vercel para atendimento Eletro Lider Barretos",
+  "main": "api/webhook.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node api/webhook.js"
+  },
+  "dependencies": {
+    "openai": "^4.104.0"
+  },
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  }
+}
