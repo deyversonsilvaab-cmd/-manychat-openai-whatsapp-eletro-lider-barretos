@@ -1,117 +1,120 @@
-# ManyChat + OpenAI + Vercel — Eletro Líder Barretos
+# Eletro Líder — ManyChat + OpenAI + Lista de Produtos
 
-Projeto MVP para atendimento automático da Eletro Líder Barretos via ManyChat/WhatsApp, usando OpenAI e Vercel.
+Versão 2 do webhook com consulta de lista de produtos.
+
+## O que esta versão faz
+
+1. Recebe mensagem do ManyChat.
+2. Identifica itens e quantidades.
+3. Consulta `data/produtos.csv`.
+4. Informa somente se a loja trabalha ou não trabalha com o item encontrado na base.
+5. Nunca informa preço.
+6. Nunca informa estoque.
+7. Nunca inventa produto.
+8. Monta resumo da lista captada.
+9. Encaminha para vendedor da loja de Barretos.
+10. Informa endereço, WhatsApp e telefone fixo da unidade Barretos.
+11. Encaminha para Rio Preto quando necessário.
+
+## Dados oficiais configurados
+
+Barretos:
+
+- Endereço: Rua 16 nº 89, esquina da Avenida 29, Centro - Barretos/SP
+- WhatsApp: 17 98804-9204
+- Telefone fixo: 17 3324-5600
+- Vendedores: Victor, Paula, José Lucas e Felipe
+
+Rio Preto:
+
+- WhatsApp: 17 98816-0214
+- Link: https://wa.me/5517988160214
 
 ## Estrutura
 
 ```txt
-manychat-openai-whatsapp
-├── api
-│   └── webhook.js
-├── package.json
-├── vercel.json
-├── .env.example
-└── README.md
+api/webhook.js
+lib/product-search.js
+data/produtos.csv
+scripts/check-list.js
+scripts/normalize-list.js
+package.json
+vercel.json
+.env.example
+README.md
 ```
 
-## 1. Criar repositório no GitHub
+## Como trocar a lista de produtos no GitHub
 
-1. Acesse o GitHub.
-2. Clique em **+**.
-3. Clique em **New repository**.
-4. Nome sugerido:
+Sempre que quiser atualizar a lista:
+
+1. Abra o repositório no GitHub.
+2. Entre na pasta `data`.
+3. Clique no arquivo `produtos.csv`.
+4. Clique no lápis ou em `Upload files`.
+5. Substitua pelo novo arquivo CSV.
+6. O nome precisa continuar exatamente:
 
 ```txt
-manychat-openai-whatsapp
+produtos.csv
 ```
 
-5. Marque como **Private**.
-6. Clique em **Create repository**.
+7. Clique em `Commit changes`.
+8. A Vercel fará o redeploy automaticamente.
 
-## 2. Subir os arquivos
+## Atenção
 
-Você pode subir pelo navegador:
+Não suba arquivo com outro nome, como:
 
-1. Entre no repositório.
-2. Clique em **Add file**.
-3. Clique em **Upload files**.
-4. Envie todos os arquivos do projeto.
-5. Clique em **Commit changes**.
-
-Ou pelo terminal:
-
-```bash
-git clone https://github.com/SEU_USUARIO/manychat-openai-whatsapp.git
-cd manychat-openai-whatsapp
-# copie os arquivos para esta pasta
-git add .
-git commit -m "Projeto inicial ManyChat OpenAI"
-git push
+```txt
+LISTAGEM SIMPLIFICADA DE PRODUTOS completa.csv
 ```
 
-## 3. Conectar na Vercel
+O sistema espera este nome:
 
-1. Acesse a Vercel.
-2. Clique em **Add New Project**.
-3. Escolha o repositório `manychat-openai-whatsapp`.
-4. Clique em **Import**.
-5. Mantenha as configurações padrão.
-6. Antes de publicar, configure as variáveis de ambiente.
+```txt
+data/produtos.csv
+```
 
-## 4. Configurar variáveis de ambiente na Vercel
+## Variáveis da Vercel
 
-Em **Settings > Environment Variables**, adicione:
+Configure em Settings > Environment Variables:
 
 ```env
-OPENAI_API_KEY=sua_chave_da_openai
+OPENAI_API_KEY=sua_chave_nova_da_openai
 OPENAI_MODEL=gpt-4.1-mini
 STORE_NAME=Eletro Líder Barretos
 STORE_CITY=Barretos/SP
+STORE_ADDRESS=Rua 16 nº 89, esquina da Avenida 29, Centro - Barretos/SP
+STORE_WHATSAPP=17 98804-9204
+STORE_PHONE=17 3324-5600
+RIO_PRETO_WHATSAPP=17 98816-0214
+RIO_PRETO_LINK=https://wa.me/5517988160214
 HUMAN_HANDOFF_MESSAGE=Para eu não te passar uma informação errada, vou encaminhar sua mensagem para um atendente da Eletro Líder te confirmar certinho.
 ```
 
-Depois clique em **Deploy**.
+Nunca coloque sua chave real dentro do GitHub.
 
-## 5. URL do webhook
+## Teste da API
 
-Depois do deploy, a Vercel vai gerar uma URL parecida com:
-
-```txt
-https://manychat-openai-whatsapp.vercel.app
-```
-
-A URL do webhook será:
+Abra no navegador:
 
 ```txt
-https://manychat-openai-whatsapp.vercel.app/api/webhook
+https://SEU-PROJETO.vercel.app/api/webhook
 ```
 
-Teste abrindo no navegador. Deve aparecer:
+Deve retornar:
 
 ```json
 {
   "ok": true,
-  "service": "manychat-openai-whatsapp"
+  "service": "manychat-openai-whatsapp-produtos"
 }
 ```
 
-## 6. Configurar no ManyChat
+## Payload para ManyChat
 
-No ManyChat:
-
-1. Vá em **Automação**.
-2. Crie uma automação.
-3. Adicione um gatilho de palavra-chave, por exemplo:
-   - `palpite`
-   - `orçamento`
-   - `preço`
-   - `estoque`
-   - `atendente`
-4. Depois adicione a ação:
-   - **External Request**
-   - ou **Solicitação Externa**
-
-## 7. Configuração da solicitação externa
+Use Solicitação Externa / External Request:
 
 Método:
 
@@ -119,215 +122,105 @@ Método:
 POST
 ```
 
-URL:
-
-```txt
-https://SEU-PROJETO.vercel.app/api/webhook
-```
-
-Headers:
-
-```txt
-Content-Type: application/json
-```
-
-Body JSON:
+Body:
 
 ```json
 {
   "name": "{{first_name}}",
   "phone": "{{phone}}",
-  "message": "{{last_text_input}}"
+  "message": "{{last_text_input}}",
+  "items": "{{cf_lista_itens_json}}"
 }
 ```
 
-Caso o ManyChat use outro campo para a última mensagem, substitua `{{last_text_input}}` pelo campo correto disponível no seu painel.
+## Campos para salvar no ManyChat
 
-## 8. Como salvar o retorno no ManyChat
-
-A API retorna:
-
-```json
-{
-  "ok": true,
-  "reply": "mensagem para o cliente",
-  "intent": "pedido_orcamento",
-  "handoff": true,
-  "leadData": {
-    "nome": "João",
-    "telefone": "17999999999",
-    "produto": "cabo 10mm",
-    "quantidade": "100 metros",
-    "cidade": "Barretos",
-    "palpite": "",
-    "primeiroGol": ""
-  },
-  "palpite": "",
-  "primeiroGol": "",
-  "produto": "cabo 10mm",
-  "quantidade": "100 metros",
-  "cidade": "Barretos"
-}
-```
-
-Crie campos personalizados no ManyChat:
+Crie campos personalizados:
 
 ```txt
-ai_reply
-ai_intent
-ai_handoff
-ai_palpite
-ai_primeiro_gol
-ai_produto
-ai_quantidade
-ai_cidade
+cf_ai_reply
+cf_ai_intent
+cf_ai_handoff
+cf_ai_lead_score
+cf_lista_itens_json
+cf_resumo_itens
+cf_ai_needs_more_items
 ```
 
-Mapeie:
+Mapeamento:
 
 ```txt
-$.reply          -> ai_reply
-$.intent         -> ai_intent
-$.handoff        -> ai_handoff
-$.palpite        -> ai_palpite
-$.primeiroGol    -> ai_primeiro_gol
-$.produto        -> ai_produto
-$.quantidade     -> ai_quantidade
-$.cidade         -> ai_cidade
+$.reply          -> cf_ai_reply
+$.intent         -> cf_ai_intent
+$.handoff        -> cf_ai_handoff
+$.leadScore      -> cf_ai_lead_score
+$.needsMoreItems -> cf_ai_needs_more_items
+$.itemsJson      -> cf_lista_itens_json
+$.resumo         -> cf_resumo_itens
 ```
 
-## 9. Responder o cliente
-
-Depois da solicitação externa, adicione uma mensagem de WhatsApp com:
+Depois responda o cliente com:
 
 ```txt
-{{ai_reply}}
+{{cf_ai_reply}}
 ```
 
-## 10. Encaminhar para atendente humano
+## Condição para vendedor
 
-Crie uma condição:
+Se:
 
 ```txt
-Se ai_handoff = true
+cf_ai_handoff = true
 ```
 
-Então:
+Ação:
 
-1. Notifique a equipe.
-2. Adicione tag:
-   - `Atendimento Humano`
-3. Pare o fluxo automático ou encaminhe para o setor responsável.
-
-Mensagem interna sugerida:
+1. Adicionar tag `Atendimento Humano`.
+2. Notificar equipe.
+3. Enviar resumo:
 
 ```txt
-Novo atendimento para humano.
+Novo atendimento Eletro Líder Barretos
 
 Nome: {{first_name}}
 Telefone: {{phone}}
-Intenção: {{ai_intent}}
-Produto: {{ai_produto}}
-Quantidade: {{ai_quantidade}}
-Cidade: {{ai_cidade}}
-Mensagem IA: {{ai_reply}}
+Intenção: {{cf_ai_intent}}
+Lead: {{cf_ai_lead_score}}
+
+Resumo:
+{{cf_resumo_itens}}
+
+Mensagem da IA:
+{{cf_ai_reply}}
 ```
 
-Se `ai_handoff = false`, continue o fluxo automático normalmente.
+## Exemplo de cliente
 
-## 11. Teste com exemplos reais
-
-### Saudação
-
-Payload:
-
-```json
-{
-  "name": "Carlos",
-  "phone": "17999999999",
-  "message": "Oi, bom dia"
-}
-```
-
-Resposta esperada:
-
-```json
-{
-  "reply": "Bom dia, Carlos! Tudo bem? Como posso te ajudar hoje na Eletro Líder?",
-  "intent": "saudacao",
-  "handoff": false
-}
-```
-
-### Pedido de preço
-
-Payload:
-
-```json
-{
-  "name": "Marcos",
-  "phone": "17999999999",
-  "message": "Quanto está o cabo 10mm?"
-}
-```
-
-Resposta esperada:
-
-```json
-{
-  "reply": "Consigo te ajudar sim. Para eu te passar certinho para a equipe confirmar, você precisa de quantos metros de cabo 10mm?",
-  "intent": "consulta_preco",
-  "handoff": true
-}
-```
-
-### Hora do Chute
-
-Payload:
-
-```json
-{
-  "name": "Pedro",
-  "phone": "17999999999",
-  "message": "Brasil 2x0, primeiro gol 22 minutos"
-}
-```
-
-Resposta esperada:
-
-```json
-{
-  "reply": "✅ Palpite registrado! Placar: Brasil 2x0. Primeiro gol: 22 minutos. Boa sorte na Copa dos Eletricistas da Eletro Líder!",
-  "intent": "campanha_hora_do_chute",
-  "handoff": false
-}
-```
-
-## 12. Como editar o prompt do atendente
-
-Abra o arquivo:
+Cliente:
 
 ```txt
-api/webhook.js
+Preciso de 100m cabo 10mm e 2 disjuntores bipolar 40a
 ```
 
-Procure pela função:
+Resposta esperada:
 
-```js
-function buildSystemPrompt()
+```txt
+Perfeito, consegui organizar sua solicitação.
+
+Encontrei esses itens na nossa base:
+• Cabo 10mm — 100m
+• Disjuntor bipolar 40A — 2 unidades
+
+Vou encaminhar para um vendedor da Eletro Líder Barretos confirmar disponibilidade e dar continuidade ao atendimento.
 ```
 
-Edite as regras dentro dela.
+## Melhorias incluídas
 
-## 13. Melhorias futuras
-
-Esta versão não usa banco de dados e não usa Google Sheets.
-
-Melhorias possíveis:
-
-1. Salvar leads em Google Sheets.
-2. Criar histórico por telefone.
-3. Criar setores: orçamento, eletricistas, financeiro e reclamações.
-4. Criar dashboard de leads.
-5. Integrar catálogo real de produtos.
-6. Integrar estoque real do sistema da loja.
+1. Consulta real na lista de produtos.
+2. Captação acumulada da lista de itens.
+3. Campo `itemsJson` para guardar a lista no ManyChat.
+4. Resumo automático dos itens.
+5. Lead score: frio, morno, quente ou muito quente.
+6. Dados oficiais da loja Barretos.
+7. Encaminhamento para Rio Preto.
+8. Regras anti-invenção de preço, estoque e produto.
