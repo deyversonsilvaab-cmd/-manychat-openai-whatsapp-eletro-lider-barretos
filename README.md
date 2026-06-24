@@ -224,3 +224,38 @@ Vou encaminhar para um vendedor da Eletro Líder Barretos confirmar disponibilid
 6. Dados oficiais da loja Barretos.
 7. Encaminhamento para Rio Preto.
 8. Regras anti-invenção de preço, estoque e produto.
+
+
+## Regras de entrega — Eletro Líder Barretos
+
+A Eletro Líder realiza entregas para compras a partir de **R$ 50,00**.
+
+Área de atendimento:
+
+- Entregamos dentro da cidade de Barretos/SP.
+
+Exceção:
+
+- Não realizamos entregas para o bairro **Vida Nova**.
+
+Quando o cliente perguntar sobre entrega:
+
+- Se o cliente ainda não informou o bairro, a IA deve perguntar o bairro.
+- Se for Barretos e não for Vida Nova, a IA informa que entregamos para compras a partir de R$ 50,00.
+- Se for Vida Nova, a IA informa que não fazemos entrega no bairro e oferece retirada na loja.
+- A IA nunca deve prometer prazo de entrega sem confirmação da equipe.
+- A IA nunca deve informar taxa de entrega sem confirmação da equipe.
+- Para cidades fora de Barretos, a IA deve encaminhar para vendedor confirmar.
+
+Contato da loja Barretos:
+
+- WhatsApp: 17 98804-9204
+- Telefone fixo: 17 3324-5600
+
+## Variáveis adicionais para entrega
+
+```env
+DELIVERY_MINIMUM_ORDER=50.00
+DELIVERY_CITY=Barretos
+DELIVERY_EXCLUDED_NEIGHBORHOOD=Vida Nova
+```
