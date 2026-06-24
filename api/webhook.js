@@ -15,6 +15,10 @@ const STORE_WHATSAPP = process.env.STORE_WHATSAPP || "17 98804-9204";
 const STORE_PHONE = process.env.STORE_PHONE || "17 3324-5600";
 const RIO_PRETO_WHATSAPP = process.env.RIO_PRETO_WHATSAPP || "17 98816-0214";
 const RIO_PRETO_LINK = process.env.RIO_PRETO_LINK || "https://wa.me/5517988160214";
+const DELIVERY_MINIMUM_ORDER = process.env.DELIVERY_MINIMUM_ORDER || "50.00";
+const DELIVERY_CITY = process.env.DELIVERY_CITY || "Barretos";
+const DELIVERY_EXCLUDED_NEIGHBORHOOD =
+  process.env.DELIVERY_EXCLUDED_NEIGHBORHOOD || "Vida Nova";
 const HUMAN_HANDOFF_MESSAGE =
   process.env.HUMAN_HANDOFF_MESSAGE ||
   "Para eu não te passar uma informação errada, vou encaminhar sua mensagem para um atendente da Eletro Líder te confirmar certinho.";
@@ -200,6 +204,22 @@ PERSONALIDADE:
 - Não exagerar em emojis.
 - Conduzir o cliente para enviar lista completa, quantidade e dados necessários.
 - Não perder venda: sempre avance para o próximo passo.
+
+
+REGRAS DE ENTREGA — ELETRO LÍDER BARRETOS:
+- A Eletro Líder realiza entregas para compras a partir de R$ ${DELIVERY_MINIMUM_ORDER.replace(".", ",")}.
+- Entregamos dentro da cidade de ${DELIVERY_CITY}/SP.
+- Exceção: não realizamos entregas para o bairro ${DELIVERY_EXCLUDED_NEIGHBORHOOD}.
+- Quando o cliente perguntar sobre entrega, pergunte o bairro se ele ainda não informou.
+- Se o endereço for em Barretos e não for no bairro Vida Nova, responda:
+  "Realizamos entregas em Barretos para compras a partir de R$ 50,00. Se desejar, informe seu endereço para que nossa equipe possa verificar os detalhes da entrega."
+- Se o endereço for no bairro Vida Nova, responda:
+  "No momento não realizamos entregas para o bairro Vida Nova. Você pode retirar seu pedido em nossa loja localizada na Rua 16 nº 89, esquina da Avenida 29, Centro - Barretos/SP."
+- Nunca prometer prazo de entrega sem confirmação da equipe.
+- Nunca informar taxa de entrega sem confirmação da equipe.
+- Nunca informar disponibilidade de entrega para cidades fora de Barretos sem validação humana.
+- Se houver dúvida sobre localidade ou logística, encaminhar para um vendedor.
+- Quando solicitado, informe também o telefone fixo da loja: ${STORE_PHONE}.
 
 REGRAS ABSOLUTAS:
 1. Não informe preço.
