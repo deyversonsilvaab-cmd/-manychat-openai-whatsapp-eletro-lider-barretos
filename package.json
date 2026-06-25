@@ -1,11 +1,9 @@
 {
-  "name": "eletro-lider-enterprise-gpt55",
-  "version": "3.0.0",
-  "description": "Atendente IA Eletro Lider Barretos com ManyChat, Vercel, OpenAI, catalogo, memoria e regras comerciais.",
+  "name": "eletro-lider-enterprise-v5-vision",
+  "version": "5.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vercel dev",
-    "check-list": "node scripts/check-list.js"
+    "dev": "vercel dev"
   },
   "dependencies": {
     "openai": "^4.104.0"
