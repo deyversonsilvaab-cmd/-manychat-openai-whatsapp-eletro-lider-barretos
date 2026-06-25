@@ -1,0 +1,13 @@
+{
+  "default_to_ai": true,
+  "handoff_intents": [
+    "pedido_orcamento",
+    "consulta_preco",
+    "consulta_estoque",
+    "falar_com_atendente",
+    "reclamacao",
+    "financeiro",
+    "arquivo_orcamento",
+    "duvida_tecnica_sensivel"
+  ]
+}

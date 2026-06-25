@@ -1,0 +1,38 @@
+{
+  "chuveiro": [
+    "resistência compatível",
+    "conector adequado",
+    "disjuntor correto",
+    "cabo adequado"
+  ],
+  "fita led": [
+    "fonte",
+    "perfil de LED",
+    "controlador",
+    "conector"
+  ],
+  "ventilador": [
+    "controle",
+    "capacitor",
+    "suporte",
+    "interruptor"
+  ],
+  "cabo": [
+    "terminais",
+    "disjuntor",
+    "eletroduto",
+    "condulete"
+  ],
+  "refletor": [
+    "cabo PP",
+    "fotocélula",
+    "disjuntor",
+    "conector"
+  ],
+  "tomada": [
+    "caixa",
+    "placa",
+    "módulo",
+    "fio"
+  ]
+}

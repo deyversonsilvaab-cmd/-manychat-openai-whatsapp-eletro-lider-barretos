@@ -1,0 +1,64 @@
+{
+  "fio": [
+    "cabo",
+    "condutor"
+  ],
+  "cabo": [
+    "fio",
+    "condutor"
+  ],
+  "disj": [
+    "disjuntor"
+  ],
+  "ratinho": [
+    "relé fotocélula",
+    "rele fotocelula",
+    "relé fotoelétrico"
+  ],
+  "lampada": [
+    "lâmpada",
+    "bulbo",
+    "led"
+  ],
+  "chuveiro": [
+    "ducha",
+    "ducha elétrica",
+    "chuveiro elétrico"
+  ],
+  "resistencia": [
+    "resistência",
+    "resistência chuveiro",
+    "resistência lorenzetti",
+    "resistência hydra"
+  ],
+  "refletor": [
+    "projetor led",
+    "refletor led"
+  ],
+  "ventilador": [
+    "ventilador de teto",
+    "ventilador de parede",
+    "ventex",
+    "ventisol"
+  ],
+  "perfil": [
+    "perfil led",
+    "perfil de led"
+  ],
+  "idr": [
+    "dr",
+    "interruptor diferencial residual"
+  ],
+  "dps": [
+    "protetor de surto",
+    "protetor surto"
+  ],
+  "eletroduto": [
+    "conduite",
+    "conduíte"
+  ],
+  "tomada": [
+    "módulo tomada",
+    "modulo tomada"
+  ]
+}

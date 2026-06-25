@@ -1,0 +1,19 @@
+{
+  "inverno": [
+    "chuveiro",
+    "ducha",
+    "resistência",
+    "aquecedor",
+    "cabo chuveiro",
+    "disjuntor chuveiro"
+  ],
+  "verao": [
+    "ventilador",
+    "exaustor",
+    "climatizador",
+    "ar condicionado",
+    "refletor led",
+    "fita led",
+    "área gourmet"
+  ]
+}

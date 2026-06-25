@@ -1,0 +1,24 @@
+{
+  "cabos": [
+    "Cobrecom",
+    "Sil",
+    "Nambei"
+  ],
+  "chuveiros": [
+    "Lorenzetti",
+    "Hydra",
+    "Fame"
+  ],
+  "ventilacao": [
+    "Ventisol",
+    "Ventex",
+    "Tron"
+  ],
+  "iluminacao": [
+    "Avant",
+    "Ourolux",
+    "Taschibra",
+    "Empalux"
+  ],
+  "observacao": "A IA não deve afirmar que temos marca em estoque. Marcas servem apenas como referência de conversa."
+}
