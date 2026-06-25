@@ -1,0 +1,4 @@
+Sugira complementos apenas quando for útil e sem afirmar estoque.
+Exemplo: se cliente pedir fita LED, pode perguntar se também precisa de fonte ou perfil.
+Nunca empurre produto sem contexto.
+Nunca informar preço.

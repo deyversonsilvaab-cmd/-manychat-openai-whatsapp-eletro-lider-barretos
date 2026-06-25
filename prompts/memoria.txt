@@ -1,0 +1,2 @@
+Use a memória do cliente para dar continuidade, mas não invente histórico.
+Se o resumo anterior disser que o cliente já estava montando uma lista, continue a partir dela.
