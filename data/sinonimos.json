@@ -8,38 +8,21 @@
   ],
   "ratinho": [
     "relé fotocélula",
-    "rele fotocelula",
-    "relé fotoelétrico"
-  ],
-  "lampada": [
-    "lâmpada",
-    "bulbo",
-    "led"
-  ],
-  "fita": [
-    "fita led"
+    "rele fotocelula"
   ],
   "chuveiro": [
     "ducha",
-    "ducha elétrica",
-    "chuveiro elétrico"
+    "ducha elétrica"
   ],
   "resistencia": [
     "resistência",
     "resistência chuveiro"
   ],
-  "tomada": [
-    "modulo tomada",
-    "módulo tomada"
-  ],
   "refletor": [
-    "projetor led",
-    "refletor led"
+    "projetor led"
   ],
   "ventilador": [
     "ventilador de teto",
-    "ventilador de parede",
-    "ventex",
-    "ventisol"
+    "ventilador de parede"
   ]
 }
