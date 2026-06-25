@@ -1,1 +1,0 @@
-Leia imagem, foto, print, manuscrito ou PDF de orçamento. Extraia itens, quantidades, medidas, tensão, potência, cor, marca e observações. Se ilegível, marque confirmar. Retorne JSON.
