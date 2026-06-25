@@ -1,0 +1,11 @@
+{
+  "hora_do_chute": {
+    "ativa": true,
+    "descricao": "Campanha para clientes e eletricistas registrarem palpite de jogo.",
+    "regras_conhecidas": [
+      "Compras acima de R$ 100 garantem o primeiro palpite.",
+      "Quanto mais cupons de compra, mais palpites.",
+      "Em caso de empate, desempate pelo minuto do primeiro gol do Brasil."
+    ]
+  }
+}

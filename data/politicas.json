@@ -1,0 +1,21 @@
+{
+  "entrega": {
+    "minimo_compra": "R$ 50,00",
+    "cidade": "Barretos/SP",
+    "bairro_excluido": "Vida Nova",
+    "regras": [
+      "Entregamos dentro da cidade de Barretos/SP para compras a partir de R$ 50,00.",
+      "Não realizamos entrega para o bairro Vida Nova.",
+      "Não prometer prazo de entrega sem confirmação da equipe.",
+      "Não informar taxa de entrega sem confirmação da equipe.",
+      "Para cidades fora de Barretos, encaminhar para vendedor confirmar."
+    ]
+  },
+  "comercial": [
+    "Não informar preço sem consulta.",
+    "Não informar estoque.",
+    "Não informar prazo.",
+    "Não inventar produtos, marcas ou promoções.",
+    "Quando houver intenção de compra, coletar dados e encaminhar para vendedor."
+  ]
+}
