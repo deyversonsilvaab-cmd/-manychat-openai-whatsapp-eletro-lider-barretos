@@ -1,0 +1,18 @@
+{
+  "name": "eletro-lider-enterprise-v6",
+  "version": "6.0.0",
+  "description": "IA comercial Eletro Lider V6 com ManyChat, Vercel, OpenAI, leitura de imagem/PDF, memoria, carrinho inteligente e base modular.",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "check-list": "node scripts/check-list.js",
+    "check-memory": "node scripts/check-memory.js",
+    "test-payload": "node tests/test-payload.js"
+  },
+  "dependencies": {
+    "openai": "^4.104.0"
+  },
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  }
+}
