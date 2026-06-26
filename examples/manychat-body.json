@@ -1,0 +1,11 @@
+{
+  "source": "manychat",
+  "channel": "whatsapp",
+  "name": "{{first_name}}",
+  "phone": "{{phone}}",
+  "message": "{{last_text_input}}",
+  "status": "{{cf_status_atendimento}}",
+  "items": "{{cf_lista_itens_json}}",
+  "summary": "{{cf_conversation_summary}}",
+  "lastIntent": "{{cf_ai_intent}}"
+}
