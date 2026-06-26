@@ -1,0 +1,27 @@
+PATCH V8.1.2 — Resposta determinística
+
+Trocar no GitHub:
+- api/webhook.js
+- api/health.js
+
+Motivo:
+O /api/health já prova que a extração e a busca estão corretas.
+Mas o WhatsApp continuou recebendo a resposta antiga "não encontrei".
+Isso pode acontecer porque o modelo ainda reescreve a resposta final.
+
+Correção:
+Quando houver itens extraídos, o webhook NÃO deixa a IA criar a resposta principal.
+Ele monta a resposta diretamente pelo código:
+
+Perfeito, entendi sua solicitação:
+• CABO FLEXIVEL 10MM — 10 MT
+• DISJUNTOR BIPOLAR 40A — 2 PC
+
+Você prefere retirada na loja ou entrega em Barretos?
+
+Depois:
+1. Subir api/webhook.js e api/health.js
+2. Commit changes
+3. Vercel > Redeploy sem cache
+4. Abrir /api/webhook no navegador e confirmar service v8-1-2
+5. Testar no ManyChat
