@@ -31,13 +31,22 @@ function resumoItems(items = []) {
   }).join("\n");
 }
 
-function fallbackCommercialReply({ items, message, lead }) {
-  if (items.length) {
-    const linhas = items.map((item) => `• ${item.descricao}${item.quantidade ? ` — ${item.quantidade}` : ""}`).join("\n");
-    return `Perfeito, entendi sua solicitação:\n\n${linhas}\n\nVocê prefere retirada na loja ou entrega em Barretos?`;
+function commercialReplyDeterministic({ items = [], suggestions = [] }) {
+  if (!items.length) {
+    return "Perfeito. Me envie os itens com as quantidades que eu organizo para o vendedor da Eletro Líder te atender certinho.";
   }
 
-  return "Perfeito. Me envie os itens com as quantidades que eu organizo para o vendedor da Eletro Líder te atender certinho.";
+  const linhas = items.map((item) => {
+    const nome = item.melhorResultado || item.descricao;
+    const qtd = item.quantidade ? ` — ${item.quantidade}` : "";
+    return `• ${nome}${qtd}`;
+  }).join("\n");
+
+  const sugestoes = suggestions.length
+    ? `\n\nTambém posso pedir para o vendedor conferir itens relacionados, como ${suggestions.slice(0, 3).join(", ")}.`
+    : "";
+
+  return `Perfeito, entendi sua solicitação:\n\n${linhas}\n\nVocê prefere retirada na loja ou entrega em Barretos?${sugestoes}`;
 }
 
 function buildIntent(message, items) {
@@ -49,7 +58,7 @@ function buildIntent(message, items) {
   return "geral";
 }
 
-async function aiRefineReply({ body, items, validated, score, route, suggestions, knowledge }) {
+async function aiOnlyWhenNoItems({ body, knowledge }) {
   const schema = {
     type: "object",
     additionalProperties: false,
@@ -64,24 +73,15 @@ async function aiRefineReply({ body, items, validated, score, route, suggestions
 
   const system = `${knowledge.systemPrompt}
 
-DADOS:
 Loja: ${STORE_NAME}
 Endereço: ${STORE_ADDRESS}
 WhatsApp: ${STORE_WHATSAPP}
 Telefone: ${STORE_PHONE}
 
-Itens extraídos e validados:
-${JSON.stringify(validated, null, 2)}
-
-Complementos possíveis:
-${JSON.stringify(suggestions, null, 2)}
-
-Instrução:
-- Se há itens validados, confirme a lista.
-- Não diga que não encontrou tudo se há pelo menos um match.
-- Nunca informe preço, estoque ou prazo.
-- Pergunte retirada ou entrega em Barretos quando fizer sentido.
-- Seja breve e vendedor.`;
+Importante:
+- Use este modelo apenas quando não houver itens extraídos.
+- Não informe preço, estoque ou prazo.
+- Peça a necessidade do cliente de forma comercial e breve.`;
 
   try {
     const response = await client.chat.completions.create({
@@ -93,7 +93,7 @@ Instrução:
       ],
       response_format: {
         type: "json_schema",
-        json_schema: { name: "reply_v81", strict: true, schema }
+        json_schema: { name: "reply_v812", strict: true, schema }
       }
     });
 
@@ -111,7 +111,7 @@ Instrução:
         ],
         response_format: {
           type: "json_schema",
-          json_schema: { name: "reply_v81", strict: true, schema }
+          json_schema: { name: "reply_v812", strict: true, schema }
         }
       });
 
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     return json(res, 200, {
       ok: true,
-      service: "eletro-lider-enterprise-v8-1-busca-forte",
+      service: "eletro-lider-enterprise-v8-1-2-resposta-deterministica",
       model: MODEL,
       webhook: "/api/webhook"
     });
@@ -200,30 +200,32 @@ export default async function handler(req, res) {
     const intent = buildIntent(message, validated);
     const finished = customerLikelyFinished(message);
 
-    let ai = {};
-    if (process.env.OPENAI_API_KEY) {
-      ai = await aiRefineReply({
-        body: { name, phone, message, previousSummary, extracted, validated, score, route },
-        items: extracted,
-        validated,
-        score,
-        route,
-        suggestions,
-        knowledge
-      });
-    }
-
-    const reply = clean(ai.reply) || fallbackCommercialReply({ items: validated, message, lead: score });
-    const needsMoreItems = typeof ai.needsMoreItems === "boolean" ? ai.needsMoreItems : !validated.length;
-    const resumo = resumoItems(validated);
-
-    // Handoff policy:
-    // If there are validated items and the customer is asking for a quote/purchase, release seller.
-    // Keep as IA if it is only greeting or vague question.
     const hasItems = validated.length > 0;
     const hasCommercialIntent = ["pedido_orcamento", "consulta_preco"].includes(intent) || finished || hasItems;
     const handoff = Boolean(hasCommercialIntent && hasItems);
     const status = handoff ? "aguardando_vendedor" : "ia_coletando";
+    const resumo = resumoItems(validated);
+
+    let reply = "";
+    let needsMoreItems = !validated.length;
+    let ai = {};
+
+    // CORREÇÃO V8.1.2:
+    // Quando há itens extraídos, não deixamos o modelo reescrever a resposta principal.
+    // Isso evita a resposta antiga: "não encontrei esse item".
+    if (hasItems) {
+      reply = commercialReplyDeterministic({ items: validated, suggestions });
+      needsMoreItems = false;
+    } else if (process.env.OPENAI_API_KEY) {
+      ai = await aiOnlyWhenNoItems({
+        body: { name, phone, message, previousSummary, extracted, validated, score, route },
+        knowledge
+      });
+      reply = clean(ai.reply) || commercialReplyDeterministic({ items: validated, suggestions });
+      needsMoreItems = typeof ai.needsMoreItems === "boolean" ? ai.needsMoreItems : true;
+    } else {
+      reply = commercialReplyDeterministic({ items: validated, suggestions });
+    }
 
     return json(res, 200, {
       ok: true,
@@ -247,6 +249,7 @@ export default async function handler(req, res) {
         rioPreto: { link: RIO_PRETO_LINK }
       },
       debug: {
+        version: "v8.1.2",
         extracted,
         topSearchCabo10mm: searchProducts("cabo 10mm", 3),
         topSearchDisj40a: searchProducts("disjuntor bipolar 40a", 3)
