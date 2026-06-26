@@ -1,18 +1,14 @@
 [
   {
-    "pergunta": "endereço",
+    "pergunta": "endereco",
     "resposta": "Rua 16 nº 89, esquina da Avenida 29, Centro - Barretos/SP."
-  },
-  {
-    "pergunta": "telefone",
-    "resposta": "17 3324-5600."
   },
   {
     "pergunta": "whatsapp",
     "resposta": "17 98804-9204."
   },
   {
-    "pergunta": "entrega",
-    "resposta": "Entregamos em Barretos para compras a partir de R$ 50,00, exceto bairro Vida Nova."
+    "pergunta": "telefone",
+    "resposta": "17 3324-5600."
   }
 ]

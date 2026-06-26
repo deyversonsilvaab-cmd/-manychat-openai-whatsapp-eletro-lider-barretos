@@ -1,19 +1,12 @@
 {
-  "barretos": {
-    "nome": "Eletro Líder Barretos",
-    "endereco": "Rua 16 nº 89, esquina da Avenida 29, Centro - Barretos/SP",
-    "whatsapp": "17 98804-9204",
-    "telefone": "17 3324-5600",
-    "vendedores": [
-      "Victor",
-      "Paula",
-      "José Lucas",
-      "Felipe"
-    ]
-  },
-  "rio_preto": {
-    "nome": "Eletro Líder São José do Rio Preto",
-    "whatsapp": "17 98816-0214",
-    "link": "https://wa.me/5517988160214"
-  }
+  "nome": "Eletro Líder Barretos",
+  "endereco": "Rua 16 nº 89, esquina da Avenida 29, Centro - Barretos/SP",
+  "whatsapp": "17 98804-9204",
+  "telefone": "17 3324-5600",
+  "vendedores": [
+    "Victor",
+    "Paula",
+    "José Lucas",
+    "Felipe"
+  ]
 }

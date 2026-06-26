@@ -2,79 +2,22 @@
   "fio": [
     "cabo",
     "condutor",
-    "cabo flexível",
     "cabo flexivel",
-    "fio flexível",
-    "fio flexivel"
+    "cabo flexível",
+    "fio flexivel",
+    "fio flexível"
   ],
   "cabo": [
     "fio",
     "condutor",
-    "cabo flexível",
     "cabo flexivel",
-    "fio flexível",
-    "fio flexivel"
+    "cabo flexível"
   ],
   "cabo flexivel": [
     "cabo flexível",
-    "fio flexível",
     "fio flexivel",
-    "condutor flexível",
+    "fio flexível",
     "condutor flexivel"
-  ],
-  "cabo 10mm": [
-    "cabo 10 mm",
-    "cabo flexível 10mm",
-    "cabo flexivel 10mm",
-    "fio 10mm",
-    "fio 10 mm",
-    "fio flexível 10mm",
-    "fio flexivel 10mm",
-    "condutor 10mm",
-    "condutor 10 mm",
-    "cabo de 10",
-    "fio de 10"
-  ],
-  "cabo 16mm": [
-    "cabo 16 mm",
-    "cabo flexível 16mm",
-    "cabo flexivel 16mm",
-    "fio 16mm",
-    "fio 16 mm",
-    "fio flexível 16mm",
-    "fio flexivel 16mm",
-    "condutor 16mm",
-    "cabo de 16",
-    "fio de 16"
-  ],
-  "cabo 2.5mm": [
-    "cabo 2,5mm",
-    "cabo 2.5 mm",
-    "cabo 2,5 mm",
-    "cabo flexível 2,5mm",
-    "cabo flexivel 2,5mm",
-    "fio 2,5mm",
-    "fio 2.5mm",
-    "fio de 2,5",
-    "cabo de 2,5"
-  ],
-  "cabo 4mm": [
-    "cabo 4 mm",
-    "cabo flexível 4mm",
-    "cabo flexivel 4mm",
-    "fio 4mm",
-    "fio 4 mm",
-    "fio de 4",
-    "cabo de 4"
-  ],
-  "cabo 6mm": [
-    "cabo 6 mm",
-    "cabo flexível 6mm",
-    "cabo flexivel 6mm",
-    "fio 6mm",
-    "fio 6 mm",
-    "fio de 6",
-    "cabo de 6"
   ],
   "disj": [
     "disjuntor"
@@ -82,137 +25,67 @@
   "disjuntor": [
     "disj",
     "disjuntor din",
-    "disjuntor geral",
+    "disjuntor nema",
     "chave disjuntora"
   ],
-  "disjuntor bipolar": [
-    "disjuntor 2p",
-    "disjuntor bip",
-    "disjuntor dois polos",
-    "disjuntor 2 polos",
-    "disjuntor bipolar din"
+  "bipolar": [
+    "2p",
+    "2 polos",
+    "dois polos",
+    "2 x"
   ],
-  "disjuntor bipolar 40a": [
-    "disjuntor 40a",
-    "disjuntor 40 a",
-    "disjuntor 2p 40a",
-    "disjuntor 2p 40 a",
-    "disjuntor bip 40a",
-    "disjuntor bipolar 40",
-    "disjuntor din bipolar 40a",
-    "disjuntor 2 polos 40a"
-  ],
-  "disjuntor bipolar 32a": [
-    "disjuntor 32a",
-    "disjuntor 32 a",
-    "disjuntor 2p 32a",
-    "disjuntor bip 32a",
-    "disjuntor bipolar 32"
-  ],
-  "disjuntor bipolar 50a": [
-    "disjuntor 50a",
-    "disjuntor 50 a",
-    "disjuntor 2p 50a",
-    "disjuntor bip 50a",
-    "disjuntor bipolar 50"
+  "tripolar": [
+    "3p",
+    "3 polos",
+    "tres polos",
+    "três polos",
+    "3 x"
   ],
   "ratinho": [
-    "relé fotocélula",
     "rele fotocelula",
-    "relé fotoelétrico",
+    "relé fotocélula",
     "rele fotoeletrico",
-    "fotocélula",
+    "relé fotoelétrico",
     "fotocelula"
   ],
   "lampada": [
     "lâmpada",
     "bulbo",
-    "led",
     "lampada led",
-    "lâmpada led",
-    "bulbo led"
+    "lâmpada led"
   ],
   "chuveiro": [
     "ducha",
-    "ducha elétrica",
     "ducha eletrica",
-    "chuveiro elétrico",
-    "chuveiro eletrico"
+    "ducha elétrica",
+    "chuveiro eletrico",
+    "chuveiro elétrico"
   ],
   "resistencia": [
     "resistência",
-    "resistência chuveiro",
     "resistencia chuveiro",
-    "resistência lorenzetti",
-    "resistencia lorenzetti",
-    "resistência hydra",
-    "resistencia hydra"
+    "resistência chuveiro"
   ],
   "refletor": [
     "projetor led",
-    "refletor led",
     "holofote",
-    "holofote led"
+    "refletor led"
   ],
   "ventilador": [
     "ventilador de teto",
     "ventilador de parede",
     "ventex",
     "ventisol",
-    "circulador",
     "exaustor"
-  ],
-  "perfil": [
-    "perfil led",
-    "perfil de led",
-    "canaleta led",
-    "perfil aluminio led",
-    "perfil alumínio led"
-  ],
-  "idr": [
-    "dr",
-    "interruptor diferencial residual",
-    "dispositivo dr"
-  ],
-  "dps": [
-    "protetor de surto",
-    "protetor surto",
-    "dispositivo de proteção contra surto",
-    "dispositivo protecao surto"
-  ],
-  "eletroduto": [
-    "conduite",
-    "conduíte",
-    "cano conduíte",
-    "cano conduite"
-  ],
-  "tomada": [
-    "módulo tomada",
-    "modulo tomada",
-    "tomada 10a",
-    "tomada 20a",
-    "tomada vermelha",
-    "tomada branca"
-  ],
-  "interruptor": [
-    "tecla",
-    "módulo interruptor",
-    "modulo interruptor",
-    "interruptor simples",
-    "interruptor paralelo"
   ],
   "fita led": [
     "fita de led",
-    "led fita",
-    "fita 12v",
-    "fita 127v",
-    "fita 220v",
-    "rolo fita led"
+    "rolo fita led",
+    "led fita"
   ],
   "fonte": [
     "fonte chaveada",
     "fonte led",
-    "driver",
-    "transformador fita led"
+    "driver"
   ]
 }

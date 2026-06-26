@@ -1,30 +1,15 @@
 {
-  "comercial": [
-    "Não informar preço.",
-    "Não informar estoque.",
-    "Não informar prazo.",
-    "Não inventar produto, marca, promoção ou disponibilidade.",
-    "Quando houver intenção de compra, organizar o pedido e encaminhar para vendedor."
+  "regras": [
+    "Nunca informar preço.",
+    "Nunca informar estoque.",
+    "Nunca informar prazo.",
+    "Nunca inventar produto, marca, promoção ou disponibilidade.",
+    "Se encontrou no catálogo, pode dizer que trabalhamos com o item.",
+    "Se não encontrou, continuar a venda e encaminhar para vendedor confirmar."
   ],
   "entrega": {
     "minimo": "R$ 50,00",
     "cidade": "Barretos/SP",
-    "bairro_excluido": "Vida Nova",
-    "regras": [
-      "Entregamos em Barretos para compras a partir de R$ 50,00.",
-      "Não entregamos no bairro Vida Nova.",
-      "Perguntar o bairro quando necessário.",
-      "Não informar prazo nem taxa sem confirmação."
-    ]
-  },
-  "arquivos": [
-    "Ler imagens, prints, fotos, manuscritos e PDFs quando houver URL acessível.",
-    "Não inventar item ilegível.",
-    "Se a leitura estiver ruim, pedir imagem mais nítida."
-  ],
-  "seguranca_tecnica": [
-    "Para risco elétrico, norma, instalação ou dimensionamento, responder com cautela.",
-    "Nunca assumir responsabilidade técnica por instalação.",
-    "Encaminhar para especialista quando necessário."
-  ]
+    "bairro_excluido": "Vida Nova"
+  }
 }
