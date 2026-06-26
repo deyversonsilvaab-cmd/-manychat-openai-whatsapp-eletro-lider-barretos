@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    service: "eletro-lider-enterprise-v8-1-busca-forte",
+    service: "eletro-lider-enterprise-v8-1-1-correcao-disjuntores",
     productsLoaded: loadProducts().length,
     testExtraction: extractItems(testMessage),
     testSearch: {
