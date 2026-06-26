@@ -1,98 +1,104 @@
-# Eletro Líder Enterprise V6
+# Eletro Líder Enterprise V8.1 — Busca Forte
 
-Versão Enterprise com:
-- Atendimento sem depender de gatilho pré-definido.
-- Leitura de imagem, foto, print, manuscrito e PDF por URL.
-- Memória de cliente por telefone.
-- Carrinho inteligente.
-- Busca de produtos com sinônimos e categorias.
-- Cross-sell consultivo.
-- Lead Score automático.
-- Handoff automático para vendedor.
-- Endpoint de saúde `/api/health`.
+Esta versão corrige o problema onde a IA recebia:
 
-## Arquivos principais
+`Oi, preciso de 10 metros de cabo 10mm e 2 disjuntores bipolar 40A`
+
+e respondia que não encontrou no catálogo.
+
+## Correções principais
+
+- Extrai itens da frase do cliente antes de chamar a IA.
+- Separa lista em itens:
+  - CABO FLEXIVEL 10MM — 10 MT
+  - DISJUNTOR BIPOLAR 40A — 2 PC
+- Normaliza:
+  - 10mm, 10 mm, 10MM2, 10 MM²
+  - disj, disjuntor, 2p, bipolar, 2 x
+- Busca aproximada com pontuação.
+- Continua a venda mesmo quando algum item fica duvidoso.
+- Retorna `status`, `routeSellerName` e `routeQueue` para o ManyChat.
+
+## Arquivos principais para substituir
+
+Substitua no GitHub:
 
 ```txt
 api/webhook.js
 api/health.js
-lib/
-data/
-prompts/
-memory/
-admin/
-docs/
-examples/
+lib/utils.js
+lib/csv.js
+lib/data-loader.js
+lib/products.js
+lib/items.js
+lib/score.js
+lib/fast.js
+lib/cross-sell.js
+prompts/system.txt
+data/sinonimos.json
+data/cross-sell.json
+data/politicas.json
 ```
 
-## Configuração Vercel
+Você também pode substituir tudo pelo conteúdo do ZIP.
 
-Use as variáveis do `.env.example`.
-
-Principais:
-
-```env
-OPENAI_API_KEY=sua_chave
-OPENAI_MODEL=gpt-5.5
-FALLBACK_OPENAI_MODEL=gpt-5.4-mini
-VISION_MODEL=gpt-5.5
-ENABLE_MEMORY=true
-ENABLE_ATTACHMENT_READING=true
-ENABLE_CROSS_SELL=true
-```
-
-## ManyChat Body
+## ManyChat — Body
 
 ```json
 {
+  "source": "manychat",
+  "channel": "whatsapp",
   "name": "{{first_name}}",
   "phone": "{{phone}}",
   "message": "{{last_text_input}}",
+  "status": "{{cf_status_atendimento}}",
   "items": "{{cf_lista_itens_json}}",
   "summary": "{{cf_conversation_summary}}",
-  "lastIntent": "{{cf_ai_intent}}",
-  "image_url": "{{last_input_image_url}}",
-  "file_url": "{{last_input_file_url}}",
-  "attachment_url": "{{last_input_attachment_url}}"
+  "lastIntent": "{{cf_ai_intent}}"
 }
 ```
 
-## Mapeamento
+## ManyChat — Mapeamento
 
 ```txt
-$.reply -> cf_ai_reply
-$.intent -> cf_ai_intent
-$.handoff -> cf_ai_handoff
-$.leadScore -> cf_ai_lead_score
-$.needsMoreItems -> cf_ai_needs_more_items
-$.itemsJson -> cf_lista_itens_json
-$.resumo -> cf_resumo_itens
-$.conversationSummary -> cf_conversation_summary
-$.nextAction -> cf_next_action
-$.attachmentSummary -> cf_attachment_summary
-$.attachmentConfidence -> cf_attachment_confidence
-$.needsBetterImage -> cf_needs_better_image
-$.crossSellSuggestions -> cf_cross_sell
+reply -> cf_ai_reply
+intent -> cf_ai_intent
+handoff -> cf_ai_handoff
+leadScore -> cf_ai_lead_score
+needsMoreItems -> cf_ai_needs_more_items
+itemsJson -> cf_lista_itens_json
+resumo -> cf_resumo_itens
+conversationSummary -> cf_conversation_summary
+nextAction -> cf_next_action
+status -> cf_status_atendimento
+routeSellerId -> cf_route_seller_id
+routeSellerName -> cf_route_seller_name
+routeQueue -> cf_route_queue
 ```
 
-## Mensagem ao cliente
+## Depois de subir
+
+1. Commit changes no GitHub.
+2. Vercel > Deployments > Redeploy.
+3. Abrir `/api/health`.
+4. Conferir se aparece:
+   - service: eletro-lider-enterprise-v8-1-busca-forte
+   - productsLoaded perto de 5700
+   - testExtraction com cabo e disjuntor
+   - testSearch com resultados.
+5. Testar no WhatsApp:
 
 ```txt
-{{cf_ai_reply}}
+Oi, preciso de 10 metros de cabo 10mm e 2 disjuntores bipolar 40A
 ```
 
-## Handoff
+Resposta esperada:
 
-Se `cf_ai_handoff = true`:
-- Tag `ATENDIMENTO_HUMANO`
-- Tag `ORCAMENTO_ELETRO_LIDER`
-- Notificar vendedor com resumo.
+```txt
+Perfeito, entendi sua solicitação:
 
-## Default Reply
+• CABO FLEXIVEL 10MM — 10 MT
+• DISJUNTOR BIPOLAR 40A — 2 PC
 
-Configure este fluxo como:
-- Resposta Padrão / Default Reply
-ou
-- Gatilho "O usuário envia uma mensagem"
-
-Assim qualquer mensagem sem gatilho também entra na IA.
+Você prefere retirada na loja ou entrega em Barretos?
+```
