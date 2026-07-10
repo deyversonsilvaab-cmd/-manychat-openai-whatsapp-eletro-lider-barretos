@@ -289,6 +289,7 @@ try {
   
   let reply = "";
   let needsMoreItems = !validated.length;
+    let ai = {};
   if (hasItems) {
     reply = commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
     needsMoreItems = false;
