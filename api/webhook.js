@@ -90,26 +90,26 @@ async function aiOnlyWhenNoItems({ body, knowledge }) {
       conversationSummary: { type: "string" },
       nextAction: { type: "string" }
     }
-      };
+  };
 
-  const system = `${knowledge.systemPrompt}
+const system = `${knowledge.systemPrompt}
 
-  Loja: ${STORE_NAME}
-  Endereço: ${STORE_ADDRESS}
-  WhatsApp: ${STORE_WHATSAPP}
-  Telefone: ${STORE_PHONE}
+Loja: ${STORE_NAME}
+Endereço: ${STORE_ADDRESS}
+WhatsApp: ${STORE_WHATSAPP}
+Telefone: ${STORE_PHONE}
 
-  Importante:
-  - Use este modelo apenas quando não houver itens extraídos.
-  - Não informe preço, estoque ou prazo.
-  - Peça a necessidade do cliente de forma comercial, breve e humana.`;
+Importante:
+- Use este modelo apenas quando não houver itens extraídos.
+- Não informe preço, estoque ou prazo.
+- Peça a necessidade do cliente de forma comercial, breve e humana.`;
 
 try {
   const response = await client.chat.completions.create({
     model: MODEL,
     temperature: 0.4,
     messages: [
-{ role: "system", content: system },
+      { role: "system", content: system },
       { role: "user", content: JSON.stringify(body, null, 2) }
       ],
     response_format: {
@@ -152,7 +152,7 @@ if (req.method === "OPTIONS") return res.status(200).end();
 if (req.method === "GET") {
   return json(res, 200, {
     ok: true,
-    service: "eletro-lider-enterprise-v8-2-humanizado",
+    service: "eletro-lider-enterprise-v8-5-echo-guard",
     model: MODEL,
     webhook: "/api/webhook"
   });
@@ -175,6 +175,7 @@ try {
     return json(res, 200, {
       ok: true,
       reply: "Me envie sua mensagem ou lista de materiais que eu te ajudo.",
+      messageEcho: "",
       intent: "sem_mensagem",
       handoff: false,
       leadScore: "frio",
@@ -201,6 +202,7 @@ try {
       return json(res, 200, {
         ok: true,
         reply: fast.reply,
+        messageEcho: message,
         intent: fast.intent,
         handoff: false,
         leadScore: "frio",
@@ -221,6 +223,7 @@ try {
     return json(res, 200, {
       ok: true,
       reply: `Sem problemas${firstName(name) ? `, ${firstName(name)}` : ""}! Vamos começar de novo. Me conta os itens que você precisa que eu já organizo tudinho.`,
+      messageEcho: message,
       intent: "reset_pedido",
       handoff: false,
       leadScore: "frio",
@@ -279,6 +282,7 @@ try {
   return json(res, 200, {
     ok: true,
     reply,
+    messageEcho: message,
     intent,
     handoff,
     leadScore: score,
@@ -298,7 +302,7 @@ try {
       rioPreto: { link: RIO_PRETO_LINK }
     },
     debug: {
-      version: "v8.2",
+      version: "v8.5",
       extracted,
       topSearchCabo10mm: searchProducts("cabo 10mm", 3),
       topSearchDisj40a: searchProducts("disjuntor bipolar 40a", 3)
@@ -310,6 +314,7 @@ try {
   return json(res, 200, {
     ok: false,
     reply: "Recebi sua mensagem, mas tive uma instabilidade para processar. Vou encaminhar para um atendente da Eletro Líder te ajudar.",
+    messageEcho: (req.body && (req.body.message || req.body.text || req.body.last_text_input || req.body.mensagem)) || "",
     intent: "erro",
     handoff: true,
     leadScore: "morno",
