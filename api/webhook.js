@@ -19,129 +19,155 @@ const STORE_PHONE = process.env.STORE_PHONE || "17 3324-5600";
 const RIO_PRETO_LINK = process.env.RIO_PRETO_LINK || "https://wa.me/5517988160214";
 
 function json(res, status, payload) {
-  res.status(status).setHeader("Content-Type", "application/json");
-  return res.json(payload);
+    res.status(status).setHeader("Content-Type", "application/json");
+    return res.json(payload);
+}
+
+function toItemsField(items = []) {
+    try {
+          return Buffer.from(JSON.stringify(items || []), "utf-8").toString("base64");
+    } catch {
+          return "W10=";
+    }
+}
+
+function parseItemsField(raw) {
+    if (raw == null || raw === "") return [];
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === "object") return raw;
+    if (typeof raw === "string") {
+          try {
+                  const decoded = Buffer.from(raw, "base64").toString("utf-8");
+                  const parsed = JSON.parse(decoded);
+                  if (Array.isArray(parsed)) return parsed;
+          } catch {}
+          try {
+                  const parsed = JSON.parse(raw);
+                  if (Array.isArray(parsed)) return parsed;
+          } catch {}
+    }
+    return [];
 }
 
 function firstName(name = "") {
-  const n = clean(name);
-  if (!n) return "";
-  return n.split(" ")[0];
+    const n = clean(name);
+    if (!n) return "";
+    return n.split(" ")[0];
 }
 
 function resumoItems(items = []) {
-  if (!items.length) return "";
-  return items.map((item) => {
-    const ok = item.trabalhamos ? "encontrado no catálogo" : "confirmar com vendedor";
-    return `• ${item.descricao}${item.quantidade ? ` — ${item.quantidade}` : ""} (${ok})`;
-  }).join("\n");
+    if (!items.length) return "";
+    return items.map((item) => {
+          const ok = item.trabalhamos ? "encontrado no catálogo" : "confirmar com vendedor";
+          return `• ${item.descricao}${item.quantidade ? ` — ${item.quantidade}` : ""} (${ok})`;
+    }).join("\n");
 }
 
 function commercialReplyDeterministic({ items = [], suggestions = [], name = "", isFollowUp = false, alreadyHandedOff = false, deliveryMentioned = false }) {
-  const saud = firstName(name);
+    const saud = firstName(name);
 
-if (!items.length) {
-  return `${saud ? `${saud}, pode` : "Pode"} me mandar os itens com as quantidades que eu já organizo tudo certinho para o vendedor da Eletro Líder te atender.`;
-}
+  if (!items.length) {
+        return `${saud ? `${saud}, pode` : "Pode"} me mandar os itens com as quantidades que eu já organizo tudo certinho para o vendedor da Eletro Líder te atender.`;
+  }
 
-const linhas = items.map((item) => {
-  const nome = item.melhorResultado || item.descricao;
-  const qtd = item.quantidade ? ` — ${item.quantidade}` : "";
-  return `• ${nome}${qtd}`;
-}).join("\n");
+  const linhas = items.map((item) => {
+        const nome = item.melhorResultado || item.descricao;
+        const qtd = item.quantidade ? ` — ${item.quantidade}` : "";
+        return `• ${nome}${qtd}`;
+  }).join("\n");
 
-const sugestoes = suggestions.length
-  ? `\n\nTambém posso pedir para o vendedor conferir itens relacionados, como ${suggestions.slice(0, 3).join(", ")}.`
-  : "";
+  const sugestoes = suggestions.length
+      ? `\n\nTambém posso pedir para o vendedor conferir itens relacionados, como ${suggestions.slice(0, 3).join(", ")}.`
+        : "";
 
-if (alreadyHandedOff) {
-  return `Perfeito, já está tudo anotado com o vendedor:\n\n${linhas}\n\nQuer acrescentar mais algum item, ou já posso deixar assim para o vendedor confirmar direitinho com você?${sugestoes}`;
-}
+  if (alreadyHandedOff) {
+        return `Perfeito, já está tudo anotado com o vendedor:\n\n${linhas}\n\nQuer acrescentar mais algum item, ou já posso deixar assim para o vendedor confirmar direitinho com você?${sugestoes}`;
+  }
 
-if (isFollowUp) {
-  return `Show, segue o que já tenho anotado aqui:\n\n${linhas}\n\nQuer adicionar mais algum item, ou já posso chamar o vendedor para fechar com você?${sugestoes}`;
-}
+  if (isFollowUp) {
+        return `Show, segue o que já tenho anotado aqui:\n\n${linhas}\n\nQuer adicionar mais algum item, ou já posso chamar o vendedor para fechar com você?${sugestoes}`;
+  }
 
-const intro = saud ? `${saud}, entendi sua solicitação` : "Perfeito, entendi sua solicitação";
-  const pergunta = deliveryMentioned
-  ? "Já anotei sua preferência de entrega/retirada, vou repassar tudo certinho para o vendedor."
-    : "Você prefere retirada na loja ou entrega em Barretos?";
+  const intro = saud ? `${saud}, entendi sua solicitação` : "Perfeito, entendi sua solicitação";
+    const pergunta = deliveryMentioned
+      ? "Já anotei sua preferência de entrega/retirada, vou repassar tudo certinho para o vendedor."
+          : "Você prefere retirada na loja ou entrega em Barretos?";
 
-return `${intro}:\n\n${linhas}\n\n${pergunta}${sugestoes}`;
+  return `${intro}:\n\n${linhas}\n\n${pergunta}${sugestoes}`;
 }
 
 function buildIntent(message, items) {
-  const m = message.toLowerCase();
-  if (items.length) return "pedido_orcamento";
-  if (m.includes("preço") || m.includes("preco") || m.includes("valor")) return "consulta_preco";
-  if (m.includes("entrega")) return "entrega";
-  if (m.includes("atendente") || m.includes("vendedor")) return "falar_com_atendente";
-  return "geral";
+    const m = message.toLowerCase();
+    if (items.length) return "pedido_orcamento";
+    if (m.includes("preço") || m.includes("preco") || m.includes("valor")) return "consulta_preco";
+    if (m.includes("entrega")) return "entrega";
+    if (m.includes("atendente") || m.includes("vendedor")) return "falar_com_atendente";
+    return "geral";
 }
 
 async function aiOnlyWhenNoItems({ body, knowledge }) {
-  const schema = {
-    type: "object",
-    additionalProperties: false,
-    required: ["reply", "needsMoreItems", "conversationSummary", "nextAction"],
-    properties: {
-      reply: { type: "string" },
-      needsMoreItems: { type: "boolean" },
-      conversationSummary: { type: "string" },
-      nextAction: { type: "string" }
-    }
-  };
+    const schema = {
+          type: "object",
+          additionalProperties: false,
+          required: ["reply", "needsMoreItems", "conversationSummary", "nextAction"],
+          properties: {
+                  reply: { type: "string" },
+                  needsMoreItems: { type: "boolean" },
+                  conversationSummary: { type: "string" },
+                  nextAction: { type: "string" }
+          }
+    };
 
-const system = `${knowledge.systemPrompt}
+  const system = `${knowledge.systemPrompt}
 
-Loja: ${STORE_NAME}
-Endereço: ${STORE_ADDRESS}
-WhatsApp: ${STORE_WHATSAPP}
-Telefone: ${STORE_PHONE}
+  Loja: ${STORE_NAME}
+  Endereço: ${STORE_ADDRESS}
+  WhatsApp: ${STORE_WHATSAPP}
+  Telefone: ${STORE_PHONE}
 
-Importante:
-- Use este modelo apenas quando não houver itens extraídos.
-- Não informe preço, estoque ou prazo.
-- Peça a necessidade do cliente de forma comercial, breve e humana.`;
-
-try {
-  const response = await client.chat.completions.create({
-    model: MODEL,
-    temperature: 0.4,
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: JSON.stringify(body, null, 2) }
-      ],
-    response_format: {
-      type: "json_schema",
-      json_schema: { name: "reply_v82", strict: true, schema }
-    }
-  });
-
-  return JSON.parse(response.choices?.[0]?.message?.content || "{}");
-} catch (error) {
-  console.error("AI principal falhou:", error?.message || error);
+  Importante:
+  - Use este modelo apenas quando não houver itens extraídos.
+  - Não informe preço, estoque ou prazo.
+  - Peça a necessidade do cliente de forma comercial, breve e humana.`;
 
   try {
-    const response = await client.chat.completions.create({
-      model: FALLBACK_MODEL,
-      temperature: 0.4,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: JSON.stringify(body, null, 2) }
-        ],
-      response_format: {
-        type: "json_schema",
-        json_schema: { name: "reply_v82", strict: true, schema }
-      }
-    });
+        const response = await client.chat.completions.create({
+                model: MODEL,
+                temperature: 0.4,
+                messages: [
+                  { role: "system", content: system },
+                  { role: "user", content: JSON.stringify(body, null, 2) }
+                        ],
+                response_format: {
+                          type: "json_schema",
+                          json_schema: { name: "reply_v82", strict: true, schema }
+                }
+        });
 
-  return JSON.parse(response.choices?.[0]?.message?.content || "{}");
-  } catch (fallbackError) {
-    console.error("AI fallback falhou:", fallbackError?.message || fallbackError);
-    return {};
+      return JSON.parse(response.choices?.[0]?.message?.content || "{}");
+  } catch (error) {
+        console.error("AI principal falhou:", error?.message || error);
+
+      try {
+              const response = await client.chat.completions.create({
+                        model: FALLBACK_MODEL,
+                        temperature: 0.4,
+                        messages: [
+                          { role: "system", content: system },
+                          { role: "user", content: JSON.stringify(body, null, 2) }
+                                  ],
+                        response_format: {
+                                    type: "json_schema",
+                                    json_schema: { name: "reply_v82", strict: true, schema }
+                        }
+              });
+
+          return JSON.parse(response.choices?.[0]?.message?.content || "{}");
+      } catch (fallbackError) {
+              console.error("AI fallback falhou:", fallbackError?.message || fallbackError);
+              return {};
+      }
   }
-}
 }
 
 export default async function handler(req, res) {
@@ -152,7 +178,7 @@ if (req.method === "OPTIONS") return res.status(200).end();
 if (req.method === "GET") {
   return json(res, 200, {
     ok: true,
-    service: "eletro-lider-enterprise-v8-5-echo-guard",
+    service: "eletro-lider-enterprise-v8-6-items-b64",
     model: MODEL,
     webhook: "/api/webhook"
   });
@@ -168,7 +194,7 @@ try {
   const name = clean(body.name || body.first_name || body.nome);
   const phone = clean(body.phone || body.telefone || body.whatsapp);
   const previousStatus = clean(body.status);
-  let previousItems = safeJson(body.items, []);
+  let previousItems = parseItemsField(body.items);
   const previousSummary = clean(body.summary || body.conversationSummary || "");
 
   if (!message) {
@@ -180,7 +206,7 @@ try {
       handoff: false,
       leadScore: "frio",
       needsMoreItems: true,
-      itemsJson: JSON.stringify(previousItems || []),
+      itemsJson: toItemsField(previousItems || []),
       resumo: "",
       conversationSummary: previousSummary,
       nextAction: "aguardar_mensagem",
@@ -207,7 +233,7 @@ try {
         handoff: false,
         leadScore: "frio",
         needsMoreItems: false,
-        itemsJson: "[]",
+        itemsJson: toItemsField([]),
         resumo: "",
         conversationSummary: `Cliente iniciou conversa. Intenção: ${fast.intent}.`,
         nextAction: "aguardar_necessidade",
@@ -228,7 +254,7 @@ try {
       handoff: false,
       leadScore: "frio",
       needsMoreItems: true,
-      itemsJson: "[]",
+      itemsJson: toItemsField([]),
       resumo: "",
       conversationSummary: "Cliente pediu para recomeçar o pedido.",
       nextAction: "aguardar_necessidade",
@@ -260,11 +286,9 @@ try {
   const handoff = Boolean(hasCommercialIntent && hasItems);
   const status = handoff ? "aguardando_vendedor" : "ia_coletando";
   const resumo = resumoItems(validated);
-
+  
   let reply = "";
   let needsMoreItems = !validated.length;
-  let ai = {};
-
   if (hasItems) {
     reply = commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
     needsMoreItems = false;
@@ -288,7 +312,7 @@ try {
     leadScore: score,
     needsMoreItems,
     items: validated,
-    itemsJson: JSON.stringify(validated),
+    itemsJson: toItemsField(validated),
     resumo,
     conversationSummary: clean(ai.conversationSummary) || `${name || "Cliente"} solicitou: ${message}. Itens identificados: ${validated.map(i => i.descricao).join(", ") || "nenhum"}.`,
     nextAction: clean(ai.nextAction) || (handoff ? "vendedor_confirmar_orcamento" : "coletar_mais_dados"),
@@ -302,7 +326,7 @@ try {
       rioPreto: { link: RIO_PRETO_LINK }
     },
     debug: {
-      version: "v8.5",
+      version: "v8.6",
       extracted,
       topSearchCabo10mm: searchProducts("cabo 10mm", 3),
       topSearchDisj40a: searchProducts("disjuntor bipolar 40a", 3)
@@ -319,7 +343,7 @@ try {
     handoff: true,
     leadScore: "morno",
     needsMoreItems: false,
-    itemsJson: "[]",
+    itemsJson: toItemsField([]),
     resumo: "",
     conversationSummary: "",
     nextAction: "encaminhar_humano",
