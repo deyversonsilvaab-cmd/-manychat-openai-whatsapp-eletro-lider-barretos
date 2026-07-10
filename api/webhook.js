@@ -25,9 +25,9 @@ function json(res, status, payload) {
 
 function toItemsField(items = []) {
     try {
-          return Buffer.from(JSON.stringify(items || []), "utf-8").toString("base64");
+        return Buffer.from(JSON.stringify(items || []), "utf-8").toString("base64");
     } catch {
-          return "W10=";
+        return "W10=";
     }
 }
 
@@ -36,17 +36,25 @@ function parseItemsField(raw) {
     if (Array.isArray(raw)) return raw;
     if (typeof raw === "object") return raw;
     if (typeof raw === "string") {
-          try {
-                  const decoded = Buffer.from(raw, "base64").toString("utf-8");
-                  const parsed = JSON.parse(decoded);
-                  if (Array.isArray(parsed)) return parsed;
-          } catch {}
-          try {
-                  const parsed = JSON.parse(raw);
-                  if (Array.isArray(parsed)) return parsed;
-          } catch {}
+        try {
+            const decoded = Buffer.from(raw, "base64").toString("utf-8");
+            const parsed = JSON.parse(decoded);
+            if (Array.isArray(parsed)) return parsed;
+        } catch {}
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+        } catch {}
     }
     return [];
+}
+
+function jsonSafeText(str = "") {
+    return String(str == null ? "" : str)
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/["\\]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function firstName(name = "") {
@@ -58,42 +66,44 @@ function firstName(name = "") {
 function resumoItems(items = []) {
     if (!items.length) return "";
     return items.map((item) => {
-          const ok = item.trabalhamos ? "encontrado no catálogo" : "confirmar com vendedor";
-          return `• ${item.descricao}${item.quantidade ? ` — ${item.quantidade}` : ""} (${ok})`;
-    }).join("\n");
+        const ok = item.trabalhamos ? "encontrado no catálogo" : "confirmar com vendedor";
+        const desc = jsonSafeText(item.descricao);
+        const qtd = item.quantidade ? ` — ${jsonSafeText(String(item.quantidade))}` : "";
+        return `• ${desc}${qtd} (${ok})`;
+    }).join(" | ");
 }
 
 function commercialReplyDeterministic({ items = [], suggestions = [], name = "", isFollowUp = false, alreadyHandedOff = false, deliveryMentioned = false }) {
     const saud = firstName(name);
 
-  if (!items.length) {
-        return `${saud ? `${saud}, pode` : "Pode"} me mandar os itens com as quantidades que eu já organizo tudo certinho para o vendedor da Eletro Líder te atender.`;
-  }
+if (!items.length) {
+    return `${saud ? `${saud}, pode` : "Pode"} me mandar os itens com as quantidades que eu já organizo tudo certinho para o vendedor da Eletro Líder te atender.`;
+}
 
-  const linhas = items.map((item) => {
-        const nome = item.melhorResultado || item.descricao;
-        const qtd = item.quantidade ? ` — ${item.quantidade}` : "";
-        return `• ${nome}${qtd}`;
-  }).join("\n");
+const linhas = items.map((item) => {
+    const nome = item.melhorResultado || item.descricao;
+    const qtd = item.quantidade ? ` — ${item.quantidade}` : "";
+    return `• ${nome}${qtd}`;
+}).join("\n");
 
-  const sugestoes = suggestions.length
-      ? `\n\nTambém posso pedir para o vendedor conferir itens relacionados, como ${suggestions.slice(0, 3).join(", ")}.`
-        : "";
+const sugestoes = suggestions.length
+    ? `\n\nTambém posso pedir para o vendedor conferir itens relacionados, como ${suggestions.slice(0, 3).join(", ")}.`
+    : "";
 
-  if (alreadyHandedOff) {
-        return `Perfeito, já está tudo anotado com o vendedor:\n\n${linhas}\n\nQuer acrescentar mais algum item, ou já posso deixar assim para o vendedor confirmar direitinho com você?${sugestoes}`;
-  }
+if (alreadyHandedOff) {
+    return `Perfeito, já está tudo anotado com o vendedor:\n\n${linhas}\n\nQuer acrescentar mais algum item, ou já posso deixar assim para o vendedor confirmar direitinho com você?${sugestoes}`;
+}
 
-  if (isFollowUp) {
-        return `Show, segue o que já tenho anotado aqui:\n\n${linhas}\n\nQuer adicionar mais algum item, ou já posso chamar o vendedor para fechar com você?${sugestoes}`;
-  }
+if (isFollowUp) {
+    return `Show, segue o que já tenho anotado aqui:\n\n${linhas}\n\nQuer adicionar mais algum item, ou já posso chamar o vendedor para fechar com você?${sugestoes}`;
+}
 
-  const intro = saud ? `${saud}, entendi sua solicitação` : "Perfeito, entendi sua solicitação";
+const intro = saud ? `${saud}, entendi sua solicitação` : "Perfeito, entendi sua solicitação";
     const pergunta = deliveryMentioned
-      ? "Já anotei sua preferência de entrega/retirada, vou repassar tudo certinho para o vendedor."
-          : "Você prefere retirada na loja ou entrega em Barretos?";
+    ? "Já anotei sua preferência de entrega/retirada, vou repassar tudo certinho para o vendedor."
+        : "Você prefere retirada na loja ou entrega em Barretos?";
 
-  return `${intro}:\n\n${linhas}\n\n${pergunta}${sugestoes}`;
+return `${intro}:\n\n${linhas}\n\n${pergunta}${sugestoes}`;
 }
 
 function buildIntent(message, items) {
@@ -107,251 +117,251 @@ function buildIntent(message, items) {
 
 async function aiOnlyWhenNoItems({ body, knowledge }) {
     const schema = {
-          type: "object",
-          additionalProperties: false,
-          required: ["reply", "needsMoreItems", "conversationSummary", "nextAction"],
-          properties: {
-                  reply: { type: "string" },
-                  needsMoreItems: { type: "boolean" },
-                  conversationSummary: { type: "string" },
-                  nextAction: { type: "string" }
-          }
+        type: "object",
+        additionalProperties: false,
+        required: ["reply", "needsMoreItems", "conversationSummary", "nextAction"],
+        properties: {
+            reply: { type: "string" },
+            needsMoreItems: { type: "boolean" },
+            conversationSummary: { type: "string" },
+            nextAction: { type: "string" }
+        }
     };
 
-  const system = `${knowledge.systemPrompt}
+const system = `${knowledge.systemPrompt}
 
-  Loja: ${STORE_NAME}
-  Endereço: ${STORE_ADDRESS}
-  WhatsApp: ${STORE_WHATSAPP}
-  Telefone: ${STORE_PHONE}
+Loja: ${STORE_NAME}
+Endereço: ${STORE_ADDRESS}
+WhatsApp: ${STORE_WHATSAPP}
+Telefone: ${STORE_PHONE}
 
-  Importante:
-  - Use este modelo apenas quando não houver itens extraídos.
-  - Não informe preço, estoque ou prazo.
-  - Peça a necessidade do cliente de forma comercial, breve e humana.`;
+Importante:
+- Use este modelo apenas quando não houver itens extraídos.
+- Não informe preço, estoque ou prazo.
+- Peça a necessidade do cliente de forma comercial, breve e humana.`;
 
-  try {
+try {
+    const response = await client.chat.completions.create({
+        model: MODEL,
+        temperature: 0.4,
+        messages: [
+            { role: "system", content: system },
+            { role: "user", content: JSON.stringify(body, null, 2) }
+            ],
+        response_format: {
+            type: "json_schema",
+            json_schema: { name: "reply_v82", strict: true, schema }
+        }
+    });
+
+    return JSON.parse(response.choices?.[0]?.message?.content || "{}");
+} catch (error) {
+    console.error("AI principal falhou:", error?.message || error);
+
+    try {
         const response = await client.chat.completions.create({
-                model: MODEL,
-                temperature: 0.4,
-                messages: [
-                  { role: "system", content: system },
-                  { role: "user", content: JSON.stringify(body, null, 2) }
-                        ],
-                response_format: {
-                          type: "json_schema",
-                          json_schema: { name: "reply_v82", strict: true, schema }
-                }
+            model: FALLBACK_MODEL,
+            temperature: 0.4,
+            messages: [
+                { role: "system", content: system },
+                { role: "user", content: JSON.stringify(body, null, 2) }
+                ],
+            response_format: {
+                type: "json_schema",
+                json_schema: { name: "reply_v82", strict: true, schema }
+            }
         });
 
-      return JSON.parse(response.choices?.[0]?.message?.content || "{}");
-  } catch (error) {
-        console.error("AI principal falhou:", error?.message || error);
-
-      try {
-              const response = await client.chat.completions.create({
-                        model: FALLBACK_MODEL,
-                        temperature: 0.4,
-                        messages: [
-                          { role: "system", content: system },
-                          { role: "user", content: JSON.stringify(body, null, 2) }
-                                  ],
-                        response_format: {
-                                    type: "json_schema",
-                                    json_schema: { name: "reply_v82", strict: true, schema }
-                        }
-              });
-
-          return JSON.parse(response.choices?.[0]?.message?.content || "{}");
-      } catch (fallbackError) {
-              console.error("AI fallback falhou:", fallbackError?.message || fallbackError);
-              return {};
-      }
-  }
+    return JSON.parse(response.choices?.[0]?.message?.content || "{}");
+    } catch (fallbackError) {
+        console.error("AI fallback falhou:", fallbackError?.message || fallbackError);
+        return {};
+    }
+}
 }
 
 export default async function handler(req, res) {
-  cors(res);
+    cors(res);
 
 if (req.method === "OPTIONS") return res.status(200).end();
 
 if (req.method === "GET") {
-  return json(res, 200, {
-    ok: true,
-    service: "eletro-lider-enterprise-v8-6-items-b64",
-    model: MODEL,
-    webhook: "/api/webhook"
-  });
+    return json(res, 200, {
+        ok: true,
+        service: "eletro-lider-enterprise-v8-7-summary-safe",
+        model: MODEL,
+        webhook: "/api/webhook"
+    });
 }
 
 if (req.method !== "POST") {
-  return json(res, 405, { ok: false, error: "Use POST." });
+    return json(res, 405, { ok: false, error: "Use POST." });
 }
 
 try {
-  const body = req.body || {};
-  const message = clean(body.message || body.text || body.last_text_input || body.mensagem);
-  const name = clean(body.name || body.first_name || body.nome);
-  const phone = clean(body.phone || body.telefone || body.whatsapp);
-  const previousStatus = clean(body.status);
-  let previousItems = parseItemsField(body.items);
-  const previousSummary = clean(body.summary || body.conversationSummary || "");
+    const body = req.body || {};
+    const message = clean(body.message || body.text || body.last_text_input || body.mensagem);
+    const name = clean(body.name || body.first_name || body.nome);
+    const phone = clean(body.phone || body.telefone || body.whatsapp);
+    const previousStatus = clean(body.status);
+    let previousItems = parseItemsField(body.items);
+    const previousSummary = clean(body.summary || body.conversationSummary || "");
 
-  if (!message) {
+    if (!message) {
+        return json(res, 200, {
+            ok: true,
+            reply: "Me envie sua mensagem ou lista de materiais que eu te ajudo.",
+            messageEcho: "",
+            intent: "sem_mensagem",
+            handoff: false,
+            leadScore: "frio",
+            needsMoreItems: true,
+            itemsJson: toItemsField(previousItems || []),
+            resumo: "",
+            conversationSummary: previousSummary,
+            nextAction: "aguardar_mensagem",
+            status: "ia_coletando",
+            routeSellerId: "",
+            routeSellerName: "",
+            routeQueue: ""
+        });
+    }
+
+    const resetRequested = customerWantsReset(message);
+    if (resetRequested) {
+        previousItems = [];
+    }
+
+    if (truth(process.env.ENABLE_FAST_REPLY ?? "true") && (!previousItems || !previousItems.length) && !resetRequested) {
+        const fast = fastReply(message);
+        if (fast) {
+            return json(res, 200, {
+                ok: true,
+                reply: fast.reply,
+                messageEcho: message,
+                intent: fast.intent,
+                handoff: false,
+                leadScore: "frio",
+                needsMoreItems: false,
+                itemsJson: toItemsField([]),
+                resumo: "",
+                conversationSummary: `Cliente iniciou conversa. Intenção: ${fast.intent}.`,
+                nextAction: "aguardar_necessidade",
+                status: "ia_coletando",
+                routeSellerId: "",
+                routeSellerName: "",
+                routeQueue: ""
+            });
+        }
+    }
+
+    if (resetRequested) {
+        return json(res, 200, {
+            ok: true,
+            reply: `Sem problemas${firstName(name) ? `, ${firstName(name)}` : ""}! Vamos começar de novo. Me conta os itens que você precisa que eu já organizo tudinho.`,
+            messageEcho: message,
+            intent: "reset_pedido",
+            handoff: false,
+            leadScore: "frio",
+            needsMoreItems: true,
+            itemsJson: toItemsField([]),
+            resumo: "",
+            conversationSummary: "Cliente pediu para recomeçar o pedido.",
+            nextAction: "aguardar_necessidade",
+            status: "ia_coletando",
+            routeSellerId: "",
+            routeSellerName: "",
+            routeQueue: ""
+        });
+    }
+
+    const knowledge = loadKnowledge();
+    const extracted = extractItems(message);
+    const merged = mergeItems(previousItems, extracted);
+    const validated = validateItems(merged);
+    const score = leadScore({ message, items: validated });
+    const route = routeSeller({ message, items: validated, score });
+    const suggestions = crossSell(validated);
+    const intent = buildIntent(message, validated);
+    const finished = customerLikelyFinished(message);
+    const deliveryMentioned = needsDeliveryQuestion(message);
+
+    const previousDescs = new Set((previousItems || []).map((i) => norm(clean(i.descricao || i.produto || i.item || ""))));
+    const newlyAdded = extracted.filter((i) => !previousDescs.has(norm(clean(i.descricao))));
+    const isFollowUp = (previousItems || []).length > 0 && newlyAdded.length === 0;
+    const alreadyHandedOff = previousStatus === "aguardando_vendedor";
+
+    const hasItems = validated.length > 0;
+    const hasCommercialIntent = ["pedido_orcamento", "consulta_preco"].includes(intent) || finished || hasItems;
+    const handoff = Boolean(hasCommercialIntent && hasItems);
+    const status = handoff ? "aguardando_vendedor" : "ia_coletando";
+    const resumo = resumoItems(validated);
+
+    let reply = "";
+    let needsMoreItems = !validated.length;
+    let ai = {};
+    if (hasItems) {
+        reply = commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
+        needsMoreItems = false;
+    } else if (process.env.OPENAI_API_KEY) {
+        ai = await aiOnlyWhenNoItems({
+            body: { name, phone, message, previousSummary, extracted, validated, score, route },
+            knowledge
+        });
+        reply = clean(ai.reply) || commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
+        needsMoreItems = typeof ai.needsMoreItems === "boolean" ? ai.needsMoreItems : true;
+    } else {
+        reply = commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
+    }
+
     return json(res, 200, {
-      ok: true,
-      reply: "Me envie sua mensagem ou lista de materiais que eu te ajudo.",
-      messageEcho: "",
-      intent: "sem_mensagem",
-      handoff: false,
-      leadScore: "frio",
-      needsMoreItems: true,
-      itemsJson: toItemsField(previousItems || []),
-      resumo: "",
-      conversationSummary: previousSummary,
-      nextAction: "aguardar_mensagem",
-      status: "ia_coletando",
-      routeSellerId: "",
-      routeSellerName: "",
-      routeQueue: ""
-    });
-  }
-
-  const resetRequested = customerWantsReset(message);
-  if (resetRequested) {
-    previousItems = [];
-  }
-
-  if (truth(process.env.ENABLE_FAST_REPLY ?? "true") && (!previousItems || !previousItems.length) && !resetRequested) {
-    const fast = fastReply(message);
-    if (fast) {
-      return json(res, 200, {
         ok: true,
-        reply: fast.reply,
+        reply,
         messageEcho: message,
-        intent: fast.intent,
-        handoff: false,
-        leadScore: "frio",
+        intent,
+        handoff,
+        leadScore: score,
+        needsMoreItems,
+        items: validated,
+        itemsJson: toItemsField(validated),
+        resumo,
+        conversationSummary: jsonSafeText(clean(ai.conversationSummary) || `${name || "Cliente"} solicitou: ${message}. Itens identificados: ${validated.map(i => i.descricao).join(", ") || "nenhum"}.`),
+        nextAction: clean(ai.nextAction) || (handoff ? "vendedor_confirmar_orcamento" : "coletar_mais_dados"),
+        status,
+        routeSellerId: handoff ? route.routeSellerId : "",
+        routeSellerName: handoff ? route.routeSellerName : "",
+        routeQueue: handoff ? route.routeQueue : "",
+        crossSellSuggestions: suggestions,
+        contatos: {
+            barretos: { whatsapp: STORE_WHATSAPP, telefone: STORE_PHONE, endereco: STORE_ADDRESS },
+            rioPreto: { link: RIO_PRETO_LINK }
+        },
+        debug: {
+            version: "v8.7",
+            extracted,
+            topSearchCabo10mm: searchProducts("cabo 10mm", 3),
+            topSearchDisj40a: searchProducts("disjuntor bipolar 40a", 3)
+        }
+    });
+} catch (error) {
+    console.error("webhook error", error);
+
+    return json(res, 200, {
+        ok: false,
+        reply: "Recebi sua mensagem, mas tive uma instabilidade para processar. Vou encaminhar para um atendente da Eletro Líder te ajudar.",
+        messageEcho: (req.body && (req.body.message || req.body.text || req.body.last_text_input || req.body.mensagem)) || "",
+        intent: "erro",
+        handoff: true,
+        leadScore: "morno",
         needsMoreItems: false,
         itemsJson: toItemsField([]),
         resumo: "",
-        conversationSummary: `Cliente iniciou conversa. Intenção: ${fast.intent}.`,
-        nextAction: "aguardar_necessidade",
-        status: "ia_coletando",
+        conversationSummary: "",
+        nextAction: "encaminhar_humano",
+        status: "aguardando_vendedor",
         routeSellerId: "",
         routeSellerName: "",
-        routeQueue: ""
-      });
-    }
-  }
-
-  if (resetRequested) {
-    return json(res, 200, {
-      ok: true,
-      reply: `Sem problemas${firstName(name) ? `, ${firstName(name)}` : ""}! Vamos começar de novo. Me conta os itens que você precisa que eu já organizo tudinho.`,
-      messageEcho: message,
-      intent: "reset_pedido",
-      handoff: false,
-      leadScore: "frio",
-      needsMoreItems: true,
-      itemsJson: toItemsField([]),
-      resumo: "",
-      conversationSummary: "Cliente pediu para recomeçar o pedido.",
-      nextAction: "aguardar_necessidade",
-      status: "ia_coletando",
-      routeSellerId: "",
-      routeSellerName: "",
-      routeQueue: ""
+        routeQueue: "ERRO_IA"
     });
-  }
-
-  const knowledge = loadKnowledge();
-  const extracted = extractItems(message);
-  const merged = mergeItems(previousItems, extracted);
-  const validated = validateItems(merged);
-  const score = leadScore({ message, items: validated });
-  const route = routeSeller({ message, items: validated, score });
-  const suggestions = crossSell(validated);
-  const intent = buildIntent(message, validated);
-  const finished = customerLikelyFinished(message);
-  const deliveryMentioned = needsDeliveryQuestion(message);
-
-  const previousDescs = new Set((previousItems || []).map((i) => norm(clean(i.descricao || i.produto || i.item || ""))));
-  const newlyAdded = extracted.filter((i) => !previousDescs.has(norm(clean(i.descricao))));
-  const isFollowUp = (previousItems || []).length > 0 && newlyAdded.length === 0;
-  const alreadyHandedOff = previousStatus === "aguardando_vendedor";
-
-  const hasItems = validated.length > 0;
-  const hasCommercialIntent = ["pedido_orcamento", "consulta_preco"].includes(intent) || finished || hasItems;
-  const handoff = Boolean(hasCommercialIntent && hasItems);
-  const status = handoff ? "aguardando_vendedor" : "ia_coletando";
-  const resumo = resumoItems(validated);
-  
-  let reply = "";
-  let needsMoreItems = !validated.length;
-    let ai = {};
-  if (hasItems) {
-    reply = commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
-    needsMoreItems = false;
-  } else if (process.env.OPENAI_API_KEY) {
-    ai = await aiOnlyWhenNoItems({
-      body: { name, phone, message, previousSummary, extracted, validated, score, route },
-      knowledge
-    });
-    reply = clean(ai.reply) || commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
-    needsMoreItems = typeof ai.needsMoreItems === "boolean" ? ai.needsMoreItems : true;
-  } else {
-    reply = commercialReplyDeterministic({ items: validated, suggestions, name, isFollowUp, alreadyHandedOff, deliveryMentioned });
-  }
-
-  return json(res, 200, {
-    ok: true,
-    reply,
-    messageEcho: message,
-    intent,
-    handoff,
-    leadScore: score,
-    needsMoreItems,
-    items: validated,
-    itemsJson: toItemsField(validated),
-    resumo,
-    conversationSummary: clean(ai.conversationSummary) || `${name || "Cliente"} solicitou: ${message}. Itens identificados: ${validated.map(i => i.descricao).join(", ") || "nenhum"}.`,
-    nextAction: clean(ai.nextAction) || (handoff ? "vendedor_confirmar_orcamento" : "coletar_mais_dados"),
-    status,
-    routeSellerId: handoff ? route.routeSellerId : "",
-    routeSellerName: handoff ? route.routeSellerName : "",
-    routeQueue: handoff ? route.routeQueue : "",
-    crossSellSuggestions: suggestions,
-    contatos: {
-      barretos: { whatsapp: STORE_WHATSAPP, telefone: STORE_PHONE, endereco: STORE_ADDRESS },
-      rioPreto: { link: RIO_PRETO_LINK }
-    },
-    debug: {
-      version: "v8.6",
-      extracted,
-      topSearchCabo10mm: searchProducts("cabo 10mm", 3),
-      topSearchDisj40a: searchProducts("disjuntor bipolar 40a", 3)
-    }
-  });
-} catch (error) {
-  console.error("webhook error", error);
-
-  return json(res, 200, {
-    ok: false,
-    reply: "Recebi sua mensagem, mas tive uma instabilidade para processar. Vou encaminhar para um atendente da Eletro Líder te ajudar.",
-    messageEcho: (req.body && (req.body.message || req.body.text || req.body.last_text_input || req.body.mensagem)) || "",
-    intent: "erro",
-    handoff: true,
-    leadScore: "morno",
-    needsMoreItems: false,
-    itemsJson: toItemsField([]),
-    resumo: "",
-    conversationSummary: "",
-    nextAction: "encaminhar_humano",
-    status: "aguardando_vendedor",
-    routeSellerId: "",
-    routeSellerName: "",
-    routeQueue: "ERRO_IA"
-  });
 }
 }
